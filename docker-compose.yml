@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: fixit-postgres
+    environment:
+      POSTGRES_USER: fixit
+      POSTGRES_PASSWORD: fixit_password
+      POSTGRES_DB: fixit_booking
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  booking-service:
+    build:
+      context: ./services/booking-service
+    container_name: fixit-booking-service
+    environment:
+      DATABASE_URL: postgresql://fixit:fixit_password@postgres:5432/fixit_booking
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
