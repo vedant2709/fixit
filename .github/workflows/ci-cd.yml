@@ -44,3 +44,11 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/booking-service:$IMAGE_TAG .
           docker push $ECR_REGISTRY/booking-service:$IMAGE_TAG
+
+      - name: Deploy to ECS Fargate
+        run: |
+          aws ecs update-service \
+          --cluster fixit-cluster \
+          --service booking-service \
+          --force-new-deployment \
+          --region us-east-1

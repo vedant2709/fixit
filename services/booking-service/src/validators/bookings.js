@@ -2,7 +2,7 @@ import Joi from "joi";
 
 const createBookingSchema = Joi.object({
   service_type: Joi.string()
-    .valid("plumber", "eletrician", "cleaner")
+    .valid("plumber", "electrician", "cleaner")
     .required(),
 
   slot_time: Joi.date().iso().greater("now").required(),
