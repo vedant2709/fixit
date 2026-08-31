@@ -26,15 +26,6 @@ jobs:
         working-directory: ./services/booking-service
         run: npm ci
 
-      - name: Print OIDC token claims
-        run: |
-          TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r '.value')
-          PAYLOAD=$(echo "$TOKEN" | cut -d "." -f 2)
-          # Add padding if needed
-          PADDED=$(echo "$PAYLOAD" | awk '{ padding = (4 - length % 4) % 4; printf "%s", $0; for (i=0; i<padding; i++) printf "="; print "" }')
-          echo "$PADDED" | base64 -d | jq .
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -51,5 +42,5 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         working-directory: ./services/booking-service
         run: |
-          docker build -t $ECR_REGISTRY/fixit-backend:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/fixit-backend:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/booking-service:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/booking-service:$IMAGE_TAG
