@@ -44,11 +44,26 @@ jobs:
         run: |
           docker build -t $ECR_REGISTRY/booking-service:$IMAGE_TAG .
           docker push $ECR_REGISTRY/booking-service:$IMAGE_TAG
+          docker tag $ECR_REGISTRY/booking-service:$IMAGE_TAG $ECR_REGISTRY/booking-service:latest
+          docker push $ECR_REGISTRY/booking-service:latest
 
-      - name: Deploy to ECS Fargate
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ~/fixit
+            # Pull new image from ECR
+            aws ecr get-login-password --region us-east-1 | sudo docker login --username AWS --password-stdin 319125696408.dkr.ecr.us-east-1.amazonaws.com
+            # Stop and restart services
+            sudo docker-compose down
+            sudo docker-compose pull
+            sudo docker-compose up -d
+            # Clean up old images
+            sudo docker image prune -f
+
+      - name: Verify deployment
         run: |
-          aws ecs update-service \
-          --cluster fixit-cluster \
-          --service booking-service \
-          --force-new-deployment \
-          --region us-east-1
+          curl http://44.216.124.127/health
