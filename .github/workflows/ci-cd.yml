@@ -66,4 +66,4 @@ jobs:
 
       - name: Verify deployment
         run: |
-          curl http://44.216.124.127/health
+          curl http://${{ secrets.EC2_HOST }}:3000/health
