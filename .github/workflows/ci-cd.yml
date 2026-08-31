@@ -26,16 +26,16 @@ jobs:
         working-directory: ./services/booking-service
         run: npm ci
 
+      - name: Print OIDC token claims
+        run: |
+          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+              "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           aws-region: us-east-1
-
-      - name: Print OIDC token claims
-        run: |
-          curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-              "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com"
 
       - name: Login to Amazon ECR
         id: ecr-login
